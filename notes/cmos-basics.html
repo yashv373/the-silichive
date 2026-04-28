@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CMOS Fundamentals — The Silichive</title>
+  <meta name="description" content="CMOS transistor fundamentals — inverter operation, noise margins, power analysis, and scaling. Part of The Silichive semiconductor archive.">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬡</text></svg>">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <a href="../index.html" class="site-title">
+        <span class="prompt">$</span> the-silichive<span class="cursor"></span>
+      </a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="index.html" class="active">archive</a>
+        <a href="../research/index.html">research</a>
+        <a href="../projects/index.html">projects</a>
+        <a href="../papers/index.html">papers</a>
+        <a href="../about.html">about</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <div class="breadcrumb">
+        <a href="../index.html">~</a><span>/</span><a href="index.html">archive</a><span>/</span>cmos-basics
+      </div>
+
+      <article>
+        <div class="article-header">
+          <h1>CMOS Fundamentals</h1>
+          <div class="article-meta">
+            <span>category: fundamentals</span>
+            <span>status: active</span>
+          </div>
+        </div>
+
+        <div class="article-content">
+
+          <p>
+            Complementary Metal-Oxide-Semiconductor (CMOS) technology forms the backbone of modern digital integrated circuits. Understanding CMOS fundamentals is essential for any work in VLSI design, from logic synthesis to physical implementation.
+          </p>
+
+          <h2>The CMOS Inverter</h2>
+
+          <p>
+            The CMOS inverter is the most basic building block. It consists of a PMOS pull-up network and an NMOS pull-down network connected in a complementary fashion.
+          </p>
+
+          <pre><code>         VDD
+          │
+       ┌──┴──┐
+       │ PMOS│
+       └──┬──┘
+          ├──── Vout
+       ┌──┴──┐
+       │ NMOS│
+       └──┬──┘
+          │
+         GND
+
+  Vin ──┤ gate (both transistors)</code></pre>
+
+          <p>Key characteristics:</p>
+          <ul>
+            <li><strong>Full rail-to-rail swing</strong> — output reaches VDD and GND cleanly</li>
+            <li><strong>Zero static power</strong> — in steady state, one transistor is always off (ideally)</li>
+            <li><strong>High noise margins</strong> — inherent to complementary topology</li>
+            <li><strong>Ratioless logic</strong> — sizing affects speed, not correctness</li>
+          </ul>
+
+          <h2>Voltage Transfer Characteristic</h2>
+
+          <p>
+            The VTC of a CMOS inverter maps input voltage to output voltage. The key parameters are:
+          </p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Parameter</th>
+                <th>Description</th>
+                <th>Typical Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>V<sub>IL</sub></td>
+                <td>Maximum input low voltage</td>
+                <td>~0.4 × VDD</td>
+              </tr>
+              <tr>
+                <td>V<sub>IH</sub></td>
+                <td>Minimum input high voltage</td>
+                <td>~0.6 × VDD</td>
+              </tr>
+              <tr>
+                <td>V<sub>OL</sub></td>
+                <td>Output low voltage</td>
+                <td>~0 V (GND)</td>
+              </tr>
+              <tr>
+                <td>V<sub>OH</sub></td>
+                <td>Output high voltage</td>
+                <td>~VDD</td>
+              </tr>
+              <tr>
+                <td>V<sub>M</sub></td>
+                <td>Switching threshold</td>
+                <td>~VDD/2</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Noise Margins</h2>
+
+          <p>
+            Noise margins quantify how much noise a circuit can tolerate while still functioning correctly:
+          </p>
+
+          <ul>
+            <li><strong>NM<sub>H</sub></strong> = V<sub>OH</sub> − V<sub>IH</sub> — high noise margin</li>
+            <li><strong>NM<sub>L</sub></strong> = V<sub>IL</sub> − V<sub>OL</sub> — low noise margin</li>
+          </ul>
+
+          <p>
+            A symmetric inverter (where PMOS is sized ~2–3× NMOS width to compensate for mobility difference) yields equal noise margins. This is generally the starting point for standard cell design.
+          </p>
+
+          <h2>Power Dissipation</h2>
+
+          <p>
+            CMOS power has three components:
+          </p>
+
+          <h3>Dynamic Power</h3>
+
+          <p>
+            The dominant component in traditional CMOS:
+          </p>
+
+          <pre><code>P_dynamic = α × C_L × VDD² × f</code></pre>
+
+          <p>
+            Where α is the activity factor, C<sub>L</sub> is load capacitance, and f is clock frequency. This is why voltage scaling is so effective — power scales quadratically with VDD.
+          </p>
+
+          <h3>Short-Circuit Power</h3>
+
+          <p>
+            During switching, both PMOS and NMOS are momentarily on, creating a direct path from VDD to GND. Typically 5–10% of dynamic power. Minimized by matching rise/fall times.
+          </p>
+
+          <h3>Leakage Power</h3>
+
+          <p>
+            Increasingly dominant at advanced nodes. Sources include subthreshold leakage, gate leakage, and junction leakage. This is the fundamental challenge driving FinFET adoption and advanced device architectures.
+          </p>
+
+          <div class="note">
+            <div class="note-label">Key Insight</div>
+            <p>As technology nodes shrink, the balance between dynamic and leakage power shifts dramatically. At 7nm and below, leakage management often dominates design decisions more than performance optimization.</p>
+          </div>
+
+          <h2>Scaling Considerations</h2>
+
+          <p>
+            Dennard scaling — which promised that power density remains constant as transistors shrink — broke down around the 90nm node. The consequences:
+          </p>
+
+          <ul>
+            <li>VDD scaling slowed (subthreshold leakage prevents aggressive reduction)</li>
+            <li>Power density increased with each node</li>
+            <li>Multi-core architectures became necessary</li>
+            <li>Dark silicon emerged as a design constraint</li>
+            <li>Novel device structures (FinFET, GAA) became essential</li>
+          </ul>
+
+          <blockquote>
+            <p>The end of Dennard scaling didn't end Moore's Law — it changed what we optimize for. Performance-per-watt replaced raw performance as the primary design metric.</p>
+          </blockquote>
+
+          <hr>
+
+          <p>
+            <a href="index.html">← back to archive</a>
+          </p>
+
+        </div>
+      </article>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-line">the silichive — silicon + archive</div>
+      <div class="footer-line">built with plain html/css · hosted on <a href="https://pages.github.com" target="_blank" rel="noopener">github pages</a></div>
+    </div>
+  </footer>
+
+  <div class="status-line" aria-hidden="true">
+    <span><span class="mode">NORMAL</span> &nbsp; notes/cmos-basics.html</span>
+    <span>utf-8 · html · ln 1</span>
+  </div>
+
+</body>
+</html>
