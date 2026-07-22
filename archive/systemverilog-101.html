@@ -3767,18 +3767,32 @@ function initCodeBlocks(){
 
 // ===== Syntax Highlighting =====
 function highlightSV(html){
-  var kwRe=/\b(module|endmodule|input|output|inout|assign|always|always_ff|always_comb|always_latch|begin|end|if|else|case|casez|casex|endcase|for|while|do|generate|endgenerate|parameter|localparam|initial|forever|default|unique|priority|posedge|negedge|return|disable|iff|or)\b/g;
-  var tpRe=/\b(wire|reg|logic|integer|real|genvar|bit|byte|shortint|int|longint|void|string|enum|struct|packed|union|typedef|signed|unsigned|time|interface|endinterface|modport|import|package|endpackage|function|endfunction|task|endtask|class|endclass|assert|property|assume|cover)\b/g;
-  var numRe=/\b(\d+'[bBoOdDhH][0-9a-fA-F_xXzZ]+)\b/g;
-  var snumRe=/('[01xXzZ])\b/g;
-  var sysRe=/(\$\w+)/g;
+  var kwMap = {
+    "module":1,"endmodule":1,"input":1,"output":1,"inout":1,"assign":1,"always":1,"always_ff":1,"always_comb":1,"always_latch":1,"begin":1,"end":1,"if":1,"else":1,"case":1,"casez":1,"casex":1,"endcase":1,"for":1,"while":1,"do":1,"generate":1,"endgenerate":1,"parameter":1,"localparam":1,"initial":1,"forever":1,"default":1,"unique":1,"priority":1,"posedge":1,"negedge":1,"return":1,"disable":1,"iff":1,"or":1
+  };
+  var tpMap = {
+    "wire":1,"reg":1,"logic":1,"integer":1,"real":1,"genvar":1,"bit":1,"byte":1,"shortint":1,"int":1,"longint":1,"void":1,"string":1,"enum":1,"struct":1,"packed":1,"union":1,"typedef":1,"signed":1,"unsigned":1,"time":1,"interface":1,"endinterface":1,"modport":1,"import":1,"package":1,"endpackage":1,"function":1,"endfunction":1,"task":1,"endtask":1,"class":1,"endclass":1,"assert":1,"property":1,"assume":1,"cover":1
+  };
+
   return html.split('\n').map(function(line){
     var ci=line.indexOf('//');
     var code=ci>=0?line.substring(0,ci):line;
     var comment=ci>=0?line.substring(ci):'';
-    code=code.replace(kwRe,'<span class="kw">$1</span>').replace(tpRe,'<span class="tp">$1</span>').replace(numRe,'<span class="num">$1</span>').replace(snumRe,'<span class="num">$1</span>').replace(sysRe,'<span class="fn">$1</span>');
-    if(comment)comment='<span class="cmt">'+comment+'</span>';
-    return code+comment;
+
+    var tokenRe = /\b([a-zA-Z_]\w*)\b|(\d+'[bBoOdDhH][0-9a-fA-F_xXzZ]+|'[01xXzZ])|(\$\w+)/g;
+    code = code.replace(tokenRe, function(m, word, num, sys){
+      if (word) {
+        if (kwMap[word]) return '<span class="kw">' + word + '</span>';
+        if (tpMap[word]) return '<span class="tp">' + word + '</span>';
+        return word;
+      }
+      if (num) return '<span class="num">' + num + '</span>';
+      if (sys) return '<span class="fn">' + sys + '</span>';
+      return m;
+    });
+
+    if(comment) comment = '<span class="cmt">' + comment + '</span>';
+    return code + comment;
   }).join('\n');
 }
 
